@@ -1,5 +1,4 @@
 from fontTools.ttLib import TTFont
-import fontTools.varLib.plot as ftplt
 import matplotlib.pyplot as plt
 from scipy.special import comb
 
@@ -141,3 +140,12 @@ class Font:
         ax.set_xlim(0, 1024)
         ax.set_ylim(-200, 924)
         plt.show()
+
+
+if __name__=='__main__':
+    f=Font(r'files/STFANGSO.TTF')
+    f.font_show_test('暗',process=False)
+    f.font_show_test('炎')
+    p=f.point_generation('兴',step=10)
+    from visualization import show_static
+    show_static(p,size=0.1)

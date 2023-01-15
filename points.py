@@ -595,3 +595,31 @@ class Shapes(Utils):
         :return: 点列表
         """
         return self.cuboid(x0, y0, z0, n1, n2, step, a, a, a)
+
+    def helix_fun(self, fun, lp, degree=0, add=False, deg_d=3):
+        """
+        生成半径不变，轨迹支持自定义的螺线
+        :param fun: 半径函数，定义域[0,1]
+        :param degree: 起始角度
+        内置直线（line），抛物线(parabola)，也可自定义(custom),自定义时需填写custom_points参数为你的点列表
+        :param add: 是否附加轨迹点，False时将只返回螺线上的点
+        :param deg_d: 螺线旋转速度，单位 度
+        :return: 点列表
+        """
+        points = []
+        # 绘制圆的点先放这
+        cp1 = []
+        l = len(lp)
+        # 遍历轨迹点列
+        for i in range(0, l - 1):
+            # 圆平面法向量
+            n = list(self.vec_unit(lp[i], lp[i + 1]))
+            # 用圆心，法向量，半径绘制圆上一点
+            cp = self.circle_vec_point(lp[i][0], lp[i][1], lp[i][2], fun(i/l), n, math.radians(degree))
+            cp1.append(cp)
+            degree += deg_d
+        if add:
+            points += lp
+        points += cp1
+        return points
+

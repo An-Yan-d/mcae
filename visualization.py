@@ -7,13 +7,13 @@ from matplotlib import animation, projections
 def show_static(points, color='blue', size=10, axr='equal', ax=None, show='on'):
     """
     展示静态图像
-    param points:点列表
-    param color:颜色
-    param size:点大小
-    param axr:坐标比例
-    param ax:matplotlib3d类型图
-    param show:是否立即显示，'on'则立即输出
-    return:matplotlib3d类型图
+    :param points:点列表
+    :param color:颜色
+    :param size:点大小
+    :param axr:坐标比例
+    :param ax:matplotlib3d类型图
+    :param show:是否立即显示，'on'则立即输出
+    :return:matplotlib3d类型图
     
     example:
     figure=show_static(points1,show='off')
@@ -83,13 +83,13 @@ def get_frames(cmds):
 def show_animation(cmds, interval=0.05, t0=0, t1=-1, color='blue', size=1, repeat=False):
     """
     动态3d展示
-    param cmds: 总命令集（未按时序处理的）
-    param interval:每帧间隔时间，单位 秒，default=0.05与实际播放一致
-    param t0:起始tick，默认0
-    param t1:终止tick，默认-1,-1代表到识别的最后tick
-    param color:颜色
-    param size:点大小
-    param repeat:是否重复播放（重复播放则无轨迹点）
+    :param cmds: 总命令集（未按时序处理的）
+    :param interval:每帧间隔时间，单位 秒，default=0.05与实际播放一致
+    :param t0:起始tick，默认0
+    :param t1:终止tick，默认-1,-1代表到识别的最后tick
+    :param color:颜色
+    :param size:点大小
+    :param repeat:是否重复播放（重复播放则无轨迹点）
     """
 
     fig = plt.figure()
