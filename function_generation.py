@@ -61,13 +61,13 @@ class Function:
         :return: None
         """
         try:
-            os.mkdir(f'./{folder}')
+            os.mkdir(f'./Release/{folder}')
         except FileExistsError:
             pass
         schedule_tick = []
         for cmds in self.cmds_list:
             if cmds:
-                f = open(f"./{folder}/{self.index}.mcfunction", "w")
+                f = open(f"./Release/{folder}/{self.index}.mcfunction", "w")
                 for cmd in cmds:
                     f.write(str(cmd) + "\n")
                     if is_debug:
@@ -76,7 +76,7 @@ class Function:
             self.index += 1
         self.index = 0
         if build_schedule:
-            f = open(f"./{folder}/schedule.mcfunction", "w")
+            f = open(f"./Release/{folder}/schedule.mcfunction", "w")
             for st in schedule_tick:
                 schedule = f'schedule function {namespace}:{folder}/{st} {st}\n'
                 f.write(schedule)
@@ -89,11 +89,11 @@ class Function:
         :return: None
         """
         try:
-            os.mkdir(f'./{folder}')
+            os.mkdir(f'./Release/{folder}')
         except FileExistsError:
             pass
 
-        f = open(f"./{folder}/{filename}.mcfunction", "w")
+        f = open(f"./Release/{folder}/{filename}.mcfunction", "w")
         for cmds in self.cmds_list:
             for cmd in cmds:
                 f.write(str(cmd) + "\n")
@@ -140,10 +140,10 @@ class Function:
                 cb_z = z + int(int((i + 1) / max_length) / max_width) * 3
                 self.cmds_list[i].append(setblock.Command(i, cb_x, cb_y, cb_z - 1, 'minecraft:redstone_block'))
         try:
-            os.mkdir(f'./{folder}')
+            os.mkdir(f'./Release/{folder}')
         except FileExistsError:
             pass
 
-        f = open(f"./{folder}/build_cb_seq.mcfunction", "w")
+        f = open(f"./Release/{folder}/build_cb_seq.mcfunction", "w")
         for cmd in cmds:
             f.write(str(cmd) + "\n")

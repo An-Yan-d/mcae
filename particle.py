@@ -110,9 +110,11 @@ class CmdBuilder:
     def motion_spread_from_point(self, points, x, y, z, t0, t1, name, speed, zoom=11):
         """生成粒子扩散动画"""
         motions = []
+        p=[]
         for point in points:
             motions.append([((point[0] - x) / zoom), ((point[1] - y) / zoom), ((point[2] - z) / zoom)])
-        self.motion_particle([x, y, z] * len(motions), motions, t0, t1, name, speed)
+            p.append([x, y, z])
+        self.motion_particle(p, motions, t0, t1, name, speed)
 
     def motion_centre_spread(self, points, t0, t1, name, speed, zoom=11):
         """生成粒子中心扩散动画"""

@@ -1,7 +1,10 @@
 from fontTools.ttLib import TTFont
+import fontTools.varLib.plot as ftplt
 import matplotlib.pyplot as plt
 from scipy.special import comb
+import points
 
+utils=points.Utils()
 
 class Font:
     def __init__(self, path):
@@ -114,6 +117,23 @@ class Font:
                 if is_in:
 
                     points.append([x/1024*size, y/1024*size, 0])
+        return points
+
+    def string_generation(self, str, step=5 , size=10, distance=15):
+        """
+        :param str:字符串类型
+
+        """
+        print("--------------------")
+        print("开始生成字符串")
+        points=[]
+        x=0
+        for c in str:
+            print(c)
+            points+=utils.move(self.point_generation(c,step,size),x,0,0)
+            x+=distance
+        print("生成字符串完成")
+        print("--------------------")
         return points
 
     def font_show_test(self, letter, process=True):
