@@ -1,4 +1,4 @@
-import particle
+import motion
 import function_generation
 import points
 import font
@@ -7,7 +7,7 @@ import numpy as np
 
 
 shape = points.Shapes()
-particle_cmd = particle.CmdBuilder()
+particle_cmd = motion.CmdBuilder()
 ani_func = function_generation.Function()
 
 center=[-1643,8,43]
@@ -16,7 +16,7 @@ center=[-1643,8,43]
 def coord_fun(t):
   return [[t*(10-t)*math.sin(t)/200,t*45/20,t*(10-t)*math.cos(t)/200],[-t*(10-t)*math.sin(t)/200,t*45/20,-t*(10-t)*math.cos(t)/200]]
 
-particle_cmd.cmds_fun(0,20,coord_fun,"minecraft:end_rod", 0, 0, 0, 0, 1,ppt=5)
+particle_cmd.cmds_fun(0,20,coord_fun,"minecraft:end_rod", 0, 0, 0, 0, 1, ppt=5)
 particle_cmd.static_particle(20, 20,[[0,45,0]], 'minecraft:end_rod', 0, 0, 0, 2, 1000)
 f=font.Font(r'files\hk4e_zh-cn.ttf')
 fireworks_string= f.string_generation("毕业快乐",step=20,size=5,distance=5*1.3)

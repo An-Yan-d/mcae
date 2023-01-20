@@ -1,4 +1,4 @@
-import particle
+import motion
 import function_generation
 import points
 

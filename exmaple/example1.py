@@ -1,4 +1,4 @@
-import particle
+import motion
 import function_generation
 import points
 
@@ -6,7 +6,7 @@ import points
 # 粒子相关
 # 初始化形状，粒子命令生成器，函数生成器
 shape = points.Shapes()
-particle_cmd = particle.CmdBuilder()
+particle_cmd = motion.CmdBuilder()
 ani_func = function_generation.Function()
 
 # 用粒子绘制一张彩色图片

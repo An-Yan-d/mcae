@@ -48,10 +48,9 @@ mcae是一个用于制作Minecraft原版指令动画的工具。
 
 ```python
 # 这里是导入需要用的模块，如果你不会python，可以不管
-import particle
+import motion
 import function
 import points
-
 
 # 粒子相关
 # 初始化形状，粒子命令生成器，函数生成器（如果你不会python，可以不管）

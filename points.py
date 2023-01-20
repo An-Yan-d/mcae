@@ -68,7 +68,7 @@ class Utils:
         z = z / len(points_list)
         return x, y, z
 
-    def vec_unit(self, p1, p2):
+    def vec_unit(self, p1, p2=[0,0,0]):
         """
         单位化向量
         :param p1: 向量起点
@@ -82,16 +82,14 @@ class Utils:
         x, y, z = dx * 1 / d, dy * 1 / d, dz * 1 / d
         return x, y, z
 
-    def rotate(self, u, v, w, a, x, y, z):
+    def rotate(self, u, v, w, a, points):
         """
         通过旋转矩阵绕单位向量旋转点
         :param u: 旋转轴单位向量 x
         :param v: 旋转轴单位向量 y
         :param w: 旋转轴单位向量 z
-        :param a: 角度
-        :param x: 被旋转的的点 x
-        :param y: 被旋转的的点 y
-        :param z: 被旋转的的点 z
+        :param a: 角度（度）
+        :param  points: 被旋转的的点
         :return: 旋转后的点 x,y,z 坐标
         """
         a = math.radians(a)
@@ -100,41 +98,40 @@ class Utils:
                        [(1 - math.cos(a)) * u * v + math.sin(a) * w, math.cos(a) + (1 - math.cos(a)) * v ** 2,
                         (1 - math.cos(a)) * v * w - math.sin(a) * u],
                        [(1 - math.cos(a)) * u * w - math.sin(a) * v, (1 - math.cos(a)) * w * v + math.sin(a) * u,
-                        math.cos(a) + (1 - math.cos(a)) * w ** 2]]
-                      )
-        pm = np.transpose(np.array([[x, y, z]]))
-        fm = np.dot(rm, pm)
-        rx, ry, rz = round(fm[0][0], 4), round(fm[1][0], 4), round(fm[2][0], 4)
-        return rx, ry, rz
+                        math.cos(a) + (1 - math.cos(a)) * w ** 2]])
+        pm = np.array(points).T
+        fm = np.dot(rm, pm).T
+        return fm.tolist()
 
-    def rotate_by_vec(self, u1, v1, w1, u2, v2, w2, degree, x, y, z):
-        """
-        通过旋转矩阵绕任意向量旋转点
-        :param u1: 旋转轴向量 x1
-        :param v1: 旋转轴向量 y1
-        :param w1: 旋转轴向量 z1
-        :param u2: 旋转轴向量 x2
-        :param v2: 旋转轴向量 y2
-        :param w2: 旋转轴向量 z2
-        :param degree: 角度
-        :param x: 被旋转的的点 x
-        :param y: 被旋转的的点 y
-        :param z: 被旋转的的点 z
-        :return: 旋转后的点 x,y,z 坐标
-        """
-        uu, uv, uw = self.vec_unit([u1, v1, w1], [u2, v2, w2])
-        x1, y1, z1 = x - u1, y - v1, z - w1
-        tx, ty, tz = self.rotate(uu, uv, uw, degree, x1, y1, z1)
-        rx, ry, rz = tx + u1, ty + v1, tz + w1
-        return rx, ry, rz
-
-    def rotate_points_by_vec(self, u1, v1, w1, u2, v2, w2, degree, points):
-        r_points = []
-        for p in points:
-            x, y, z = p[0], p[1], p[2]
-            rx, ry, rz = self.rotate_by_vec(u1, v1, w1, u2, v2, w2, degree, x, y, z)
-            r_points.append([rx, ry, rz])
-        return r_points
+    # def rotate_by_vec(self, u1, v1, w1, u2, v2, w2, degree, x, y, z):
+    #     """
+    #     通过旋转矩阵绕任意向量旋转点
+    #     :param u1: 旋转轴向量 x1
+    #     :param v1: 旋转轴向量 y1
+    #     :param w1: 旋转轴向量 z1
+    #     :param u2: 旋转轴向量 x2
+    #     :param v2: 旋转轴向量 y2
+    #     :param w2: 旋转轴向量 z2
+    #     :param degree: 角度
+    #     :param x: 被旋转的的点 x
+    #     :param y: 被旋转的的点 y
+    #     :param z: 被旋转的的点 z
+    #     :return: 旋转后的点 x,y,z 坐标
+    #     """
+    #     uu, uv, uw = self.vec_unit([u1, v1, w1], [u2, v2, w2])
+    #     x1, y1, z1 = x - u1, y - v1, z - w1
+    #     r = self.rotate(uu, uv, uw, degree, [[x1, y1, z1]])
+    #     tx, ty, tz = r[0][0],r[0][1],r[0][2]
+    #     rx, ry, rz = tx + u1, ty + v1, tz + w1
+    #     return rx, ry, rz
+    #
+    # def rotate_points_by_vec(self, u1, v1, w1, u2, v2, w2, degree, points):
+    #     r_points = []
+    #     for p in points:
+    #         x, y, z = p[0], p[1], p[2]
+    #         rx, ry, rz = self.rotate_by_vec(u1, v1, w1, u2, v2, w2, degree, x, y, z)
+    #         r_points.append([rx, ry, rz])
+    #     return r_points
 
     def coordinate_transformation(self, e1, e2, *points, er1=[1, 0, 0], er2=[0, 1, 0], er3=[0, 0, 1]):
         """
@@ -598,7 +595,7 @@ class Shapes(Utils):
 
     def helix_fun(self, fun, lp, degree=0, add=False, deg_d=3):
         """
-        生成半径不变，轨迹支持自定义的螺线
+        生成轨迹支持自定义的螺线
         :param fun: 半径函数，定义域[0,1]
         :param degree: 起始角度
         内置直线（line），抛物线(parabola)，也可自定义(custom),自定义时需填写custom_points参数为你的点列表

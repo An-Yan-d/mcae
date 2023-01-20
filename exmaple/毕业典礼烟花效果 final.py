@@ -1,4 +1,4 @@
-import particle
+import motion
 import function_generation
 import points
 import font
@@ -7,7 +7,7 @@ import numpy as np
 
 
 shape = points.Shapes()
-particle_cmd = particle.CmdBuilder()
+particle_cmd = motion.CmdBuilder()
 ani_func = function_generation.Function()
 
 center=[-1643,8,43]
