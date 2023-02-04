@@ -100,15 +100,15 @@ class Font:
                     is_in = not is_in
         return is_in
 
-    def point_generation(self, letter, step=5 , size=10):
+    def point_generation(self, letter, step=5 , size=10,xrange=(0, 1024),yrange=(0,1024)):
         """
         :param letter:单个字，字符串类型
 
         """
         coord = self.coord_refine(self.font2coord(letter))
         points = []
-        for x in range(0, 1024, step):
-            for y in range(-200, 924, step):
+        for x in range(*xrange, step):
+            for y in range(*yrange, step):
                 is_in = False
 
                 for part in coord:

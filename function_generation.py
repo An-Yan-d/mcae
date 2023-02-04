@@ -116,8 +116,8 @@ class Function:
         cb_y = y
         cb_z = z
         for i in range(len(self.cmds_list)):
-            # /setblock 7 4 7 minecraft:command_block{Command:"say 1"} replace
-            cmds.append(setblock.Command(0, cb_x, cb_y, cb_z, 'minecraft:command_block{Command:"function %s:%s/%s"}'
+            # /setblock 7 4 7 minecraft:command_block{PCmd:"say 1"} replace
+            cmds.append(setblock.Command(0, cb_x, cb_y, cb_z, 'minecraft:command_block{PCmd:"function %s:%s/%s"}'
                                          % (namespace, folder, i)))
             if facing == 'x+':
                 # 添加一条清除当前命令方块前的红石块的命令

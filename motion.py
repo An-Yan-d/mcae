@@ -1,27 +1,6 @@
 import points as pt
 from PIL import Image
-import copy
-
-
-class Command:
-    def __init__(self, tick, name, x, y, z, dx, dy, dz, speed, amount, mode='force'):
-        self.tick = tick
-        self.name = name
-        self.x = round(x, 2)
-        self.y = round(y, 2)
-        self.z = round(z, 2)
-        self.dx = round(dx, 2)
-        self.dy = round(dy, 2)
-        self.dz = round(dz, 2)
-        self.speed = speed
-        self.amount = amount
-        self.mode = mode
-
-    def __str__(self):
-        text = 'particle %s %s %s %s %s %s %s %s %s %s' \
-               % (self.name, self.x, self.y, self.z, self.dx, self.dy, self.dz, self.speed, self.amount, self.mode)
-        return text
-
+from Commands import *
 
 class CmdBuilder:
     def __init__(self):
@@ -86,7 +65,7 @@ class CmdBuilder:
         """生成普通粒子序列"""
         self.temp_cmds = []
         for p in points:
-            cmd = Command(t0, name, p[0], p[1], p[2], dx, dy, dz, speed, amount)
+            cmd = PCmd(t0, name, p[0], p[1], p[2], dx, dy, dz, speed, amount)
             self.temp_cmds.append(cmd)
         self.cmds_to_seq(t0, t1)
 
@@ -96,7 +75,7 @@ class CmdBuilder:
         for p, m in zip(points, motions):
             x, y, z = p[0], p[1], p[2]
             dx, dy, dz = m[0], m[1], m[2]
-            cmd = Command(t0, name, x, y, z, dx, dy, dz, speed, 0)
+            cmd = PCmd(t0, name, x, y, z, dx, dy, dz, speed, 0)
             self.temp_cmds.append(cmd)
         self.cmds_to_seq(t0, t1)
 
@@ -197,10 +176,10 @@ class CmdBuilder:
                     u1, v1, w1 = vec1[0], vec1[1], vec1[2]
                     u2, v2, w2 = vec2[0], vec2[1], vec2[2]
                     rx, ry, rz = pu.rotate_by_vec(u1, v1, w1, u2, v2, w2, degree, x, y, z)
-                    cmd = Command(t0, name, rx, ry, rz, 0, 0, 0, 0, 1)
+                    cmd = PCmd(t0, name, rx, ry, rz, 0, 0, 0, 0, 1)
                     self.temp_cmds.append(cmd)
                 else:
-                    cmd = Command(t0, name, x, y, z, 0, 0, 0, 0, 1)
+                    cmd = PCmd(t0, name, x, y, z, 0, 0, 0, 0, 1)
                     self.temp_cmds.append(cmd)
         self.cmds_to_seq(t0, t1)
 
@@ -222,7 +201,7 @@ class CmdBuilder:
                 else:
                     points = pu.array_tran(fun(tick + i * dt, *frags))
                 for p in points:
-                    cmd = Command(tick, name, p[0], p[1], p[2], dx, dy, dz, speed, amount)
+                    cmd = PCmd(tick, name, p[0], p[1], p[2], dx, dy, dz, speed, amount)
                     self.cmds.append(cmd)
 
     def static_particle_fun(self, t0, t1, points, name, dx, dy, dz, speed, amount, fun):
@@ -232,7 +211,7 @@ class CmdBuilder:
         """
         self.temp_cmds = []
         for p in points:
-            cmd = Command(t0, name, p[0], p[1], p[2], dx, dy, dz, speed, amount)
+            cmd = PCmd(t0, name, p[0], p[1], p[2], dx, dy, dz, speed, amount)
             self.temp_cmds.append(cmd)
         self.cmds_to_seq(t0, t1, fun)
 
@@ -246,7 +225,7 @@ class CmdBuilder:
             kz = -1
         tmp_cmds=self.cmds.copy()
         for cmd in tmp_cmds:
-            self.cmds.append(Command(cmd.tick, cmd.name, (1 - kx) * value + kx * cmd.x, (1 - ky) * value + ky * cmd.y,
-                                     (1 - kz) * value + kz * cmd.z, cmd.dx, cmd.dy, cmd.dz, cmd.speed, cmd.amount,
-                                     cmd.mode))
+            self.cmds.append(PCmd(cmd.tick, cmd.name, (1 - kx) * value + kx * cmd.x, (1 - ky) * value + ky * cmd.y,
+                                  (1 - kz) * value + kz * cmd.z, cmd.dx, cmd.dy, cmd.dz, cmd.speed, cmd.amount,
+                                  cmd.mode))
 

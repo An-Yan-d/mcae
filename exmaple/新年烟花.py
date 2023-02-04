@@ -6,21 +6,14 @@ import random
 import font
 import numpy as np
 import cv2
+from Commands import *
+from schedule import *
 
 globalt = 0
 
-def sound(t,p,type='minecraft:entity.firework_rocket.large_blast_far'):
-    print(t)
-    print('playsound %s ambient @a %f %f %f 999' % (type,p[0], p[1], p[2]))
 
 
-class schedule:
-    def __init__(self, t, dt, groupst=globalt):
-        self.st = t + groupst
-        self.dt = dt
 
-    def time(self, st=0, et=1):
-        return int(self.st + st * self.dt), int(self.st + et * self.dt)
 
 
 shape = points.Shapes()
@@ -83,9 +76,9 @@ def roof2(t):
     for cmd in tmp_cmds:
         for i in range(1, 11):
             motions1.cmds.append(
-                motion.Command(cmd.tick, cmd.name, cmd.x + i * (370.5 - cmd.x) / 10.5, cmd.y, cmd.z, cmd.dx, cmd.dy,
-                               cmd.dz, cmd.speed, cmd.amount,
-                               cmd.mode))
+                motion.PCmd(cmd.tick, cmd.name, cmd.x + i * (370.5 - cmd.x) / 10.5, cmd.y, cmd.z, cmd.dx, cmd.dy,
+                            cmd.dz, cmd.speed, cmd.amount,
+                            cmd.mode))
 
     motions2 = motion.CmdBuilder()
     b = shape.bezier3x_xyz([[339.5, 47.5, 141.5], [336.8, 45.5, 145.3], [333, 44, 149.2], [327, 43, 153.5]], 0.6)
@@ -95,9 +88,9 @@ def roof2(t):
     for cmd in tmp_cmds:
         for i in range(1, 16):
             motions2.cmds.append(
-                motion.Command(cmd.tick, cmd.name, cmd.x + i * (370.5 - cmd.x) / 15.5, cmd.y, cmd.z, cmd.dx, cmd.dy,
-                               cmd.dz, cmd.speed, cmd.amount,
-                               cmd.mode))
+                motion.PCmd(cmd.tick, cmd.name, cmd.x + i * (370.5 - cmd.x) / 15.5, cmd.y, cmd.z, cmd.dx, cmd.dy,
+                            cmd.dz, cmd.speed, cmd.amount,
+                            cmd.mode))
 
     motions = motion.CmdBuilder()
     motions.cmds = motions1.cmds + motions2.cmds
@@ -253,14 +246,14 @@ def firework2(t, p, n=1200, speed=2,offset=0.0,s=0.1):
     motions = motion.CmdBuilder()
     for i in range(n):
         motions.temp_cmds.append(
-            motion.Command(0, 'minecraft:firework', *p, random.gauss(0.25+offset, s), 1, random.gauss(0.25, s),
-                           random.gauss(speed, 0.25), 0))
+            motion.PCmd(0, 'minecraft:firework', *p, random.gauss(0.25 + offset, s), 1, random.gauss(0.25, s),
+                        random.gauss(speed, 0.25), 0))
     motions.cmds_to_seq(*t.time())
     p[0] = 2 * 370.5 - p[0]
     for i in range(n):
         motions.temp_cmds.append(
-            motion.Command(0, 'minecraft:firework', *p, random.gauss(-0.25-offset, s), 1, random.gauss(0.25, s),
-                           random.gauss(speed, 0.25), 0))
+            motion.PCmd(0, 'minecraft:firework', *p, random.gauss(-0.25 - offset, s), 1, random.gauss(0.25, s),
+                        random.gauss(speed, 0.25), 0))
     motions.cmds_to_seq(*t.time())
     return motions.cmds
 
@@ -268,14 +261,14 @@ def firework3(t, p, n=15000, speed=8):
     motions = motion.CmdBuilder()
     for i in range(n):
         motions.temp_cmds.append(
-            motion.Command(0, 'minecraft:end_rod', *p, random.gauss(-0.5, 0.25), 1, 0,
-                           random.gauss(speed, 0.5), 0))
+            motion.PCmd(0, 'minecraft:end_rod', *p, random.gauss(-0.5, 0.25), 1, 0,
+                        random.gauss(speed, 0.5), 0))
     motions.cmds_to_seq(*t.time())
     p[0] = 2 * 370.5 - p[0]
     for i in range(n):
         motions.temp_cmds.append(
-            motion.Command(0, 'minecraft:end_rod', *p, random.gauss(0.5, 0.25), 1, 0,
-                           random.gauss(speed, 0.5), 0))
+            motion.PCmd(0, 'minecraft:end_rod', *p, random.gauss(0.5, 0.25), 1, 0,
+                        random.gauss(speed, 0.5), 0))
     motions.cmds_to_seq(*t.time())
     return motions.cmds
 
@@ -287,25 +280,26 @@ def firework(p,t,n,r,star=True,expl=False):
     c1 = shape.helix([0, 0, 0], [0, 0, 0], 0.4, 0.5, 0, 'custom', l, False)
     c2 = shape.helix([0, 0, 0], [0, 0, 0], 0.4, 0.5, 120, 'custom', l, False)
     c3 = shape.helix([0, 0, 0], [0, 0, 0], 0.4, 0.5, 240, 'custom', l, False)
-    motions1.static_particle(*t.time(0, 0.3),c1,*default)
-    motions1.static_particle(*t.time(0, 0.3), c2, *default)
-    motions1.static_particle(*t.time(0, 0.3), c3, *default)
+    motions1.static_particle(*t.time(0, 0.3,True),c1,*default)
+    motions1.static_particle(*t.time(0, 0.3,True), c2, *default)
+    motions1.static_particle(*t.time(0, 0.3,True), c3, *default)
 
     points1=[]
     for i in range(n):
         points1+=tool.move([np.array(tool.vec_unit([random.gauss(0,1),random.gauss(0,1),random.gauss(0,1)]))*r],*p)
-    motions1.motion_spread_from_point(points1,*p,*t.time(0.4,0.4),default[0],1)
-    sound(t.time(0.4,0.4)[0],p)
+    motions1.motion_spread_from_point(points1,*p,*t.time(0.4,0.4,True),default[0],1)
+    motions1.cmds.append(SCmd(t.time(0.4,0.4,True)[0],p,'minecraft:entity.firework_rocket.large_blast_far'))
     if star:
         for i in range(24):
             point=tool.vec_unit([random.gauss(0, 1), random.gauss(0, 1), random.gauss(0, 1)])
             l2=shape.line([0,0,0],np.array(point)*1.5*r,1.5)
             l2=tool.move(l2,*p)
-            motions1.static_particle(*t.time(0.4,0.6),l2,*default)
+            motions1.static_particle(*t.time(0.4,0.6,True),l2,*default)
 
     if expl:
-            motions1.static_particle(*t.time(1,1),points1,'minecraft:firework',0,0,0,0.2,10)
-            sound(t.time(1, 1)[0], p,type='minecraft:entity.firework_rocket.twinkle_far')
+            motions1.static_particle(*t.time(1,1,True),points1,'minecraft:firework',0,0,0,0.2,10)
+            motions1.cmds.append(SCmd(t.time(1, 1,True)[0], p,'minecraft:entity.firework_rocket.twinkle_far'))
+
     return motions1.cmds
 
 def firework4(t,type):
@@ -322,11 +316,11 @@ def Firework(t,flag=True):
     k=1
     if flag:
         k=2
-    t22 = schedule(0*k, 100, t.st)
-    t23 = schedule(20*k, 100, t.st)
-    t24 = schedule(40*k, 100, t.st)
-    t25 = schedule(60*k, 100, t.st)
-    t26 = schedule(80*k, 100, t.st)
+    t22 = plan(0*k+t.st, 100)
+    t23 = plan(20*k+t.st, 100)
+    t24 = plan(40*k+t.st, 100)
+    t25 = plan(60*k+t.st, 100)
+    t26 = plan(80*k+t.st, 100)
 
     return firework([361, 110, 100], t22, 1000, 30,expl=flag) + firework([398, 90, 105], t23, 500, 15,expl=flag) \
     + firework([347, 74, 101], t24, 800, 22,expl=flag) + firework([399, 105, 90], t25, 1000, 30,expl=flag) \
@@ -336,7 +330,7 @@ def char(c,t,p,s=12):
     p[0]-=4
     print(c)
     default = ('end_rod', 0, 0, 0, 0, 1)
-    f=font.Font(r'files/演示悠然小楷.ttf')
+    f=font.Font(r'../files/演示悠然小楷.ttf')
     ps=f.point_generation(c,step=25,size=s)
     motions=motion.CmdBuilder()
     ps=tool.move(ps,*p)
@@ -358,7 +352,7 @@ def String2(t):
 
 def picture(t,hsize,center,step=0.5):
     default = ('end_rod', 0, 0, 0, 0, 1)
-    img=cv2.imread(r'files/VCG211387809830-1.jpg',0)
+    img=cv2.imread(r'../files/VCG211387809830-1.jpg', 0)
     points=[]
     (h,w)=img.shape
     ratio=w/h
@@ -377,68 +371,72 @@ def picture(t,hsize,center,step=0.5):
 
 
 
-
+S=schedule()
 # t = schedule(,)
-t0 = schedule(0, 800)
-globalt = 800
-t1 = schedule(0, 100,800)
-t2 = schedule(70, 95,800)
-t3 = schedule(140, 90,800)
-t4 = schedule(210, 80,800)
-t5 = schedule(280, 60,800)
-t6 = schedule(350, 50,800)
-t7 = schedule(410, 45,800)
-t8 = schedule(470, 40,800)
-t9 = schedule(520, 35,800)
-t10 = schedule(565, 30,800)
-t11 = schedule(610, 30,800)
-globalt = 1410
-t12 = schedule(0, 150, 1410)
-t13 = schedule(10, 150, 1410)
-t14 = schedule(20, 150, 1410)
-t15 = schedule(30, 150, 1410)
-t16 = schedule(40, 150, 1410)
-t17 = schedule(50, 150, 1410)
-t18 = schedule(60, 150, 1410)
-t19 = schedule(70, 150, 1410)
-t20 = schedule(80, 150, 1410)
+S.newplan(0, 800)
+S.newgroupstart(800)
+S.newplan(0, 100)
+S.newplan(70, 95)
+S.newplan(140, 90)
+S.newplan(210, 80)
+S.newplan(280, 60)
+S.newplan(350, 50)
+S.newplan(410, 45)
+S.newplan(470, 40)
+S.newplan(520, 35)
+S.newplan(565, 30)
+S.newplan(610, 30)
+S.newgroupstart(1410)
+S.newplan(0, 150)
+S.newplan(10, 150)
+S.newplan(20, 150)
+S.newplan(30, 150)
+S.newplan(40, 150)
+S.newplan(50, 150)
+S.newplan(60, 150)
+S.newplan(70, 150)
+S.newplan(80, 150)
+S.newgroupstart(1590)
+S.newplan(0, 150)
 
-t21=schedule(0, 150, 1590)
+S.newgroupstart(1740)
+S.newplan(0,100,'22_')
+S.newplan(90,100,'23_')
+S.newplan(50,100)
+S.newplan(150,100)
 
-t22_=schedule(0,100,1740)
-t23_=schedule(90,100,1740)
-t22=schedule(50,100,1740)
-t23=schedule(150,100,1740)
+S.newgroupstart(1990)
+S.newplan(-20,100)
 
-t24=schedule(-20,100,1990)
+S.newgroupstart(2070)
+S.newplan(0,100)
 
-# 2190
-t25=schedule(0,100,2070)
-
-t26_=schedule(50,100,2150)
-t27_=schedule(140,100,2150)
-t26=schedule(0,200,2150)
-t27=schedule(200,200,2150)
+S.newgroupstart(2150)
+S.newplan(50,100,'26_')
+S.newplan(140,100,'27_')
+S.newplan(0,200)
+S.newplan(200,200)
 
 
 CMD=[]
-CMD += ROOF(t1) + ROOF(t2) + ROOF(t3) + ROOF(t4) + ROOF(t5) + ROOF(t6) + ROOF(t7) + ROOF(t8) + roof2(t8) + ROOF(t9) \
-      + roof2(t9) + ROOF(t10) + roof2(t10) + ROOF(t11) + roof2(t11) + ring(t0)
-CMD += firework2(t12, [378.5, 7,192.5]) + firework2(t13, [378.5, 7, 187.5]) + firework2(t14, [378.5, 7,182.5]) \
-     + firework2(t15, [378.5, 7, 177.5]) + firework2(t16, [378.5, 12, 172.5]) + firework2(t17, [378.5, 14, 167.5]) \
-     + firework2(t18, [378.5, 19, 162.5]) + firework2(t19, [378.5, 20, 157.5]) + firework2(t13, [378.5, 7, 187.5]) \
-     + firework2(t20,[378.5, 23, 152.5]) + firework3(t21, [430, 15, 90])
-CMD += Firework(t22,False)+Firework(t23,False)
-CMD +=firework4(t22_,1)+firework4(t23_,2)
-CMD +=String1(t24)+firework2(t24, [393, 66,130],offset=0.75,s=0.25)
-CMD +=String2(t25)+picture(t25,30,[370.5,110,130])
-CMD += Firework(t26)+Firework(t27)
-CMD +=firework4(t26_,1)+firework4(t27_,2)
+CMD += ROOF(S[1]) + ROOF(S[2]) + ROOF(S[3]) + ROOF(S[4]) + ROOF(S[5]) + ROOF(S[6]) \
++ ROOF(S[7]) + ROOF(S[8]) + roof2(S[8]) + ROOF(S[9]) \
+      + roof2(S[9]) + ROOF(S[10]) + roof2(S[10]) + ROOF(S[11]) + roof2(S[11]) + ring(S[0])
+CMD += firework2(S[12], [378.5, 7,192.5]) + firework2(S[13], [378.5, 7, 187.5]) + firework2(S[14], [378.5, 7,182.5]) \
+     + firework2(S[15], [378.5, 7, 177.5]) + firework2(S[16], [378.5, 12, 172.5]) + firework2(S[17], [378.5, 14, 167.5]) \
+     + firework2(S[18], [378.5, 19, 162.5]) + firework2(S[19], [378.5, 20, 157.5]) + firework2(S[13], [378.5, 7, 187.5]) \
+     + firework2(S[20],[378.5, 23, 152.5]) + firework3(S[21], [430, 15, 90])
+CMD += Firework(S[22],False)+Firework(S[23],False)
+CMD +=firework4(S['22_'],1)+firework4(S['23_'],2)
+CMD +=String1(S[24])+firework2(S[24], [393, 66,130],offset=0.75,s=0.25)
+CMD +=String2(S[25])+picture(S[25],30,[370.5,110,130])
+CMD += Firework(S[26])+Firework(S[27])
+CMD +=firework4(S['26_'],1)+firework4(S['27_'],2)
 
 ani_func.add_cmd(CMD)
 ani_func.save_seq_file('firework_newyear', namespace='mcae')
 
-copy2there('Release', r'F:\mc\mc\.minecraft\saves\sjtu\datapacks\fireworks\data\mcae\functions')
+copy2there('../Release', r'F:\mc\mc\.minecraft\versions\1.18.2-Fabric\saves\sjtu\datapacks\fireworks\data\mcae\functions')
 
 # minecraft:entity.firework_rocket.large_blast_far
 # minecraft:entity.firework_rocket.twinkle_far
