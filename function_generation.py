@@ -75,6 +75,7 @@ class Function:
                 schedule_tick.append(cmds[0].tick)
             self.index += 1
         self.index = 0
+
         if build_schedule:
             f = open(f"./Release/{folder}/schedule.mcfunction", "w")
             for st in schedule_tick:

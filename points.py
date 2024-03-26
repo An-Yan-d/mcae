@@ -3,6 +3,8 @@
 """
 import math
 import numpy as np
+import cv2
+import random
 
 np.set_printoptions(suppress=True)
 
@@ -48,7 +50,22 @@ class Utils:
         """
         point_list = []
         for p in points:
-            point = [p[0] + x, p[1] + y, p[2] + z]
+            point = [x + p[0], y + p[1], z + p[2]]
+            point_list.append(point)
+        return point_list
+
+    def move_relative(self, points,type='^'):
+        """
+        整体移动点列表
+        :param points:点列表
+        :param x: x方向移动量
+        :param y: y方向移动量
+        :param z: z方向移动量
+        :return: 移动后的点列表
+        """
+        point_list = []
+        for p in points:
+            point = [type+ str(round(p[0], 2)), type + str(round(p[1], 2)), type + str(round(p[2], 2))]
             point_list.append(point)
         return point_list
 
@@ -179,7 +196,7 @@ class Shapes(Utils):
             z += dz
         return points
 
-    def line_link(self, point_list, step):
+    def line_link(self, point_list, step, end2end=True):
         """
         首位相连多个点
         :param point_list: 点列表
@@ -189,9 +206,10 @@ class Shapes(Utils):
         points = []
         for n in range(0, len(point_list)):
             # 到最后一个点时连接第一个点
-            if n == len(point_list) - 1:
-                x1, y1, z1 = point_list[n][0], point_list[n][1], point_list[n][2]
-                x2, y2, z2 = point_list[0][0], point_list[0][1], point_list[0][2]
+            if n == len(point_list) - 1 :
+                if end2end:
+                    x1, y1, z1 = point_list[n][0], point_list[n][1], point_list[n][2]
+                    x2, y2, z2 = point_list[0][0], point_list[0][1], point_list[0][2]
             else:
                 x1, y1, z1 = point_list[n][0], point_list[n][1], point_list[n][2]
                 x2, y2, z2 = point_list[n + 1][0], point_list[n + 1][1], point_list[n + 1][2]
@@ -364,8 +382,6 @@ class Shapes(Utils):
         points = []
         bezier_lists = self.bezier3x_xyz_points(points_list, step)
         for points_list in bezier_lists:
-            # for point in points_list:
-            #     points.append(point)
             points += points_list
         return points
 
@@ -483,7 +499,7 @@ class Shapes(Utils):
                                                                               z0 - r * math.sin(math.pi / 6)], step)
         return points
 
-    def polygon_apex(self, x0, y, z0, n, r, step):
+    def polygon_vertex(self, x0, y, z0, n, r, step):
         """给出中心，边数，半径，生成xz平面正多边形的各个顶点"""
         apexes = []
         ex_angle = math.radians(360 / n)
@@ -496,13 +512,13 @@ class Shapes(Utils):
 
     def polygon(self, x0, y, z0, n, r, step):
         """给出中心，边数，半径，生成xz平面正多边形"""
-        apexes = self.polygon_apex(x0, y, z0, n, r, step)
+        apexes = self.polygon_vertex(x0, y, z0, n, r, step)
         points = self.line_link(apexes, step)
         return points
 
     def regular_pyramid(self, x0, y, z0, n, r, h, step):
         """给出中心，边数，半径，高度，生成底面为正多边形的棱锥"""
-        apexes = self.polygon_apex(x0, y, z0, n, r, step)
+        apexes = self.polygon_vertex(x0, y, z0, n, r, step)
         points = self.line_link(apexes, step)
         # 棱锥顶点
         ah = (x0, y + h, z0)
@@ -545,11 +561,11 @@ class Shapes(Utils):
             n = list(self.vec_unit(lp[i], lp[i + 1]))
             # 用圆心，法向量，半径绘制圆上一点
             cp = self.circle_vec_point(x0, y0, z0, r, n, math.radians(degree))
-            cp1.append(cp)
+            points.append(cp)
+            if add:
+                points.append(lp[i])
             degree += deg_d
-        if add:
-            points += lp
-        points += cp1
+
         return points
 
     def cuboid(self, x0, y0, z0, n1, n2, step, a=1, b=1, c=1):
@@ -598,14 +614,12 @@ class Shapes(Utils):
         生成轨迹支持自定义的螺线
         :param fun: 半径函数，定义域[0,1]
         :param degree: 起始角度
-        内置直线（line），抛物线(parabola)，也可自定义(custom),自定义时需填写custom_points参数为你的点列表
         :param add: 是否附加轨迹点，False时将只返回螺线上的点
         :param deg_d: 螺线旋转速度，单位 度
         :return: 点列表
         """
         points = []
         # 绘制圆的点先放这
-        cp1 = []
         l = len(lp)
         # 遍历轨迹点列
         for i in range(0, l - 1):
@@ -613,10 +627,59 @@ class Shapes(Utils):
             n = list(self.vec_unit(lp[i], lp[i + 1]))
             # 用圆心，法向量，半径绘制圆上一点
             cp = self.circle_vec_point(lp[i][0], lp[i][1], lp[i][2], fun(i/l), n, math.radians(degree))
-            cp1.append(cp)
+            points.append(cp)
+            if add:
+                points.append(lp[i])
             degree += deg_d
-        if add:
-            points += lp
-        points += cp1
+
         return points
 
+    def randomPolyline(self, n, step, lp,sigmap=0.1, sigmar=1):
+        """
+        生成围绕轨迹的随机连线
+        :param n: 折线段数
+        :param step: 步长
+        :param lp: 参考线
+        :param sigmap: 位置随机sigma
+        :param sigmar: 次序随机sigma
+        :return:
+        """
+        s=len(lp)//n
+        intervals =[int(random.gauss(x,sigmar*s/6)) for x in list(range(0, len(lp), s))]
+        intervals.sort()  # 对间距进行排序
+        vertexes = [np.random.multivariate_normal(lp[i], np.eye(3)*sigmap) for i in intervals if i<len(lp) and i>=0]+[np.random.multivariate_normal(lp[-1], np.eye(3)*sigmap)]  # 使用间距取出元素
+        return self.bezier3x_xyz(vertexes,step)
+
+    def overbold(self,lp,n,sigma):
+        """
+
+        """
+        points=[]
+        for p in lp:
+            for i in range(n):
+                points+=[np.random.multivariate_normal(p, np.eye(3)*sigma)]
+        return points
+
+
+    def image_lossy(self, filename, hsize, p, step):
+        """
+        生成有损粒子画，灰度图
+        :param filename: images文件下的图片名（注意带后缀）
+        :param p: 图片中心坐标
+        :param hsize: 图片高度
+        :param step: 点步长
+        :return: 点列表
+        """
+        img = cv2.imread(f'images/{filename}', 0)
+        points = []
+        (h, w) = img.shape
+        ratio = w / h
+        wsize = ratio * hsize
+        nx = int(wsize / step)
+        ny = int(hsize / step)
+        for i in range(nx):
+            for j in range(ny):
+                if img[int(j / ny * h)][int(i / nx * w)] > 128:
+                    points.append([i * step - wsize / 2, -j * step + hsize / 2, 0])
+        ps = self.move(points, *p)
+        return ps

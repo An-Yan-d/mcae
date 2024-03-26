@@ -4,7 +4,7 @@ from mpl_toolkits.mplot3d import Axes3D
 from matplotlib import animation, projections
 
 
-def show_static(points, color='blue', size=10, axr='equal', ax=None, show='on'):
+def show_static(points, color='blue', size=10, axr='equal', ax=None, show=True):
     """
     展示静态图像
     :param points:点列表
@@ -12,7 +12,7 @@ def show_static(points, color='blue', size=10, axr='equal', ax=None, show='on'):
     :param size:点大小
     :param axr:坐标比例
     :param ax:matplotlib3d类型图
-    :param show:是否立即显示，'on'则立即输出
+    :param show:是否立即显示，True则立即输出
     :return:matplotlib3d类型图
     
     example:
@@ -21,7 +21,7 @@ def show_static(points, color='blue', size=10, axr='equal', ax=None, show='on'):
     将points1、points2在图中显示出来,且points2为红色
     """
     if not ax:
-        ax = Axes3D(plt.figure())
+        ax = plt.figure().add_subplot(111, projection='3d')
     x = []
     y = []
     z = []
@@ -48,7 +48,7 @@ def show_static(points, color='blue', size=10, axr='equal', ax=None, show='on'):
     # ax.set_yticks(())
     # ax.set_zticks(())
 
-    if show == 'on':
+    if show:
         plt.show()
     return ax
 
@@ -93,7 +93,7 @@ def show_animation(cmds, interval=0.05, t0=0, t1=-1, color='blue', size=1, repea
     """
 
     fig = plt.figure()
-    ax = Axes3D(fig)
+    ax = fig.add_subplot(111, projection='3d')
 
     frame_list = get_frames(cmds)
     if t1 == -1:
@@ -141,3 +141,7 @@ def show_animation(cmds, interval=0.05, t0=0, t1=-1, color='blue', size=1, repea
 
     ani = animation.FuncAnimation(fig=fig, func=frames, frames=f, interval=interval * 1000, blit=False, repeat=repeat)
     plt.show()
+
+
+if __name__=='__main__':
+    pass

@@ -330,7 +330,7 @@ def char(c,t,p,s=12):
     p[0]-=4
     print(c)
     default = ('end_rod', 0, 0, 0, 0, 1)
-    f=font.Font(r'../files/演示悠然小楷.ttf')
+    f=font.Font(r'../fonts/演示悠然小楷.ttf')
     ps=f.point_generation(c,step=25,size=s)
     motions=motion.CmdBuilder()
     ps=tool.move(ps,*p)
@@ -352,7 +352,7 @@ def String2(t):
 
 def picture(t,hsize,center,step=0.5):
     default = ('end_rod', 0, 0, 0, 0, 1)
-    img=cv2.imread(r'../files/VCG211387809830-1.jpg', 0)
+    img=cv2.imread(r'../images/VCG211387809830-1.jpg', 0)
     points=[]
     (h,w)=img.shape
     ratio=w/h
@@ -374,7 +374,7 @@ def picture(t,hsize,center,step=0.5):
 S=schedule()
 # t = schedule(,)
 S.newplan(0, 800)
-S.newgroupstart(800)
+S.setnewgroupstart(800)
 S.newplan(0, 100)
 S.newplan(70, 95)
 S.newplan(140, 90)
@@ -386,7 +386,7 @@ S.newplan(470, 40)
 S.newplan(520, 35)
 S.newplan(565, 30)
 S.newplan(610, 30)
-S.newgroupstart(1410)
+S.setnewgroupstart(1410)
 S.newplan(0, 150)
 S.newplan(10, 150)
 S.newplan(20, 150)
@@ -396,22 +396,22 @@ S.newplan(50, 150)
 S.newplan(60, 150)
 S.newplan(70, 150)
 S.newplan(80, 150)
-S.newgroupstart(1590)
+S.setnewgroupstart(1590)
 S.newplan(0, 150)
 
-S.newgroupstart(1740)
+S.setnewgroupstart(1740)
 S.newplan(0,100,'22_')
 S.newplan(90,100,'23_')
 S.newplan(50,100)
 S.newplan(150,100)
 
-S.newgroupstart(1990)
+S.setnewgroupstart(1990)
 S.newplan(-20,100)
 
-S.newgroupstart(2070)
+S.setnewgroupstart(2070)
 S.newplan(0,100)
 
-S.newgroupstart(2150)
+S.setnewgroupstart(2150)
 S.newplan(50,100,'26_')
 S.newplan(140,100,'27_')
 S.newplan(0,200)

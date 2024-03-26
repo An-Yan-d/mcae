@@ -1,5 +1,6 @@
 import points as pt
-from PIL import Image
+
+import cv2
 from Commands import *
 
 class CmdBuilder:
@@ -115,9 +116,9 @@ class CmdBuilder:
         x, y, z = pu.get_midpoint(points)
         self.motion_shrink_to_point(points, x, y, z, t0, t1, name, speed, zoom)
 
-    def particle_img(self, filename, x0, y0, z0, zoom_level, t0, t1, particle_name):
+    def particle_img_lossless(self, filename, x0, y0, z0, zoom_level, t0, t1, particle_name):
         """
-        生成粒子画，仅读取黑色像素点
+        生成无损粒子画，灰度图
         :param filename: images文件下的图片名（注意带后缀）
         :param x0: 图片左上角坐标 x
         :param y0: 图片左上角坐标 y
@@ -129,7 +130,7 @@ class CmdBuilder:
         :return: None
         """
         points = []
-        im = Image.open(f'./images/{filename}')
+        im = cv2.imread(f'./images/{filename}')
         width, height = im.size[0], im.size[1]
         for w in range(0, width):
             for h in range(0, height):
@@ -140,6 +141,7 @@ class CmdBuilder:
                     z = z0
                     points.append([x, y, z])
         self.static_particle(t0, t1, points, particle_name, 0, 0, 0, 0, 1)
+
 
     def color_particle_img(self, filename, x0, y0, z0, t0, t1, particle_size, zoom_level=7,
                            is_rotate=False, vec1=None, vec2=None, degree=None):

@@ -9,7 +9,7 @@ utils=points.Utils()
 class Font:
     def __init__(self, path):
         self.path = path
-        self.font = TTFont(path)
+        self.font = TTFont(f'fonts/{path}')
 
     def font2coord(self, letter):
         z = [{'coord': itm[0], 'flag':itm[1]} for itm in zip(self.font['glyf'][self.font.getBestCmap(
@@ -163,7 +163,7 @@ class Font:
 
 
 if __name__=='__main__':
-    f=Font(r'files/STFANGSO.TTF')
+    f=Font('STFANGSO.TTF')
     f.font_show_test('暗',process=False)
     f.font_show_test('炎')
     p=f.point_generation('兴',step=10)
